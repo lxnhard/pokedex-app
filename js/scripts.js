@@ -11,7 +11,14 @@ let pokemonRepository = (function() {
   }
   //function to add new Pokemon
   function add(item) {
-    pokemonList.push(item);
+    //check if added item is object with the same keys as the first object in pokemonList
+    if ((typeof(item) === 'object') &&
+    (Object.keys(item).length === Object.keys(pokemonList[0]).length) &&
+    (Object.keys(item).toString() === Object.keys(pokemonList[0]).toString())) {
+      pokemonList.push(item);
+    } else {
+      console.error('Wrong input');
+    }
   }
   //function to filter for Pokemon with specific name
   function findName(name) {
