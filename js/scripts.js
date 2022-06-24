@@ -1,10 +1,6 @@
 let pokemonRepository = (function() {
-  let pokemonList = [
-    {name: 'Arbok', height: 3.5, types: ['poison']},
-    {name: 'Poliwrath', height: 1.3, types: ['water', 'fighting']},
-    {name: 'Armaldo', height: 1.5, types: ['bug','rock']},
-    {name: 'Charmander', height: 0.6, types: ['fire']}
-  ];
+  let pokemonList = [];
+  let apiUrl = 'https://pokeapi.co/api/v2/pokemon/?limit=150';
 
   //retrieve all Pokemon
   function getAll() {
@@ -13,14 +9,7 @@ let pokemonRepository = (function() {
 
   //add new Pokemon
   function add(item) {
-    //check if added item is object with the same keys as the first object in pokemonList
-    if ((typeof(item) === 'object') &&
-    (Object.keys(item).length === Object.keys(pokemonList[0]).length) &&
-    (Object.keys(item).toString() === Object.keys(pokemonList[0]).toString())) {
-      pokemonList.push(item);
-    } else {
-      console.error('Wrong input');
-    }
+    pokemonList.push(item);
   }
 
   //filter for Pokemon with specific name
@@ -32,7 +21,7 @@ let pokemonRepository = (function() {
       console.log('The Pokémon you called is currently not available.');
     }
   }
-  
+
   //add pokemon to html-list
   function addListItem(pokemon) {
     let pokemonList = document.querySelector('.pokemon-list');
@@ -48,22 +37,73 @@ let pokemonRepository = (function() {
       showDetails(pokemon);
     });
   }
-
+  //fetch list data from api
+  function loadList() {
+    showLoader();
+    return fetch(apiUrl).then(function (response) {
+      return response.json();
+    }).then(function (json) {
+      json.results.forEach(function (item) {
+        let pokemon = {
+          name: item.name,
+          detailsUrl: item.url
+        };
+        add(pokemon);
+        hideLoader();
+      });
+    }).catch(function (e) {
+      console.error(e);
+      hideLoader();
+    })
+  }
+  //fetch detail data from api
+  function loadDetails(item) {
+    showLoader();
+    let url = item.detailsUrl;
+    return fetch(url).then(function (response) {
+      return response.json();
+    }).then(function (details) {
+      // Now we add the details to the item
+      item.imageUrl = details.sprites.front_default;
+      item.height = details.height;
+      item.types = details.types;
+      hideLoader();
+    }).catch(function (e) {
+      console.error(e);
+      hideLoader();
+    });
+  }
   //show details for pokemon
   function showDetails(pokemon) {
-    console.log(pokemon);
+    loadDetails(pokemon).then(function () {
+      console.log(pokemon);
+    });
   }
+//show/hide pokeball loader
+function showLoader() {
+  let loader = document.querySelector('.pokeball');
+  loader.classList.remove('hidden');
+}
+function hideLoader() {
+  let loader = document.querySelector('.pokeball');
+  loader.classList.add('hidden');
+}
 
   //return public functions
   return {
     getAll,
     add,
     findName,
-    addListItem
+    addListItem,
+    loadList,
+    loadDetails
   }
 })();
 
-//Print all objects in pokemonList (name, height and compliment for tall boys)
-pokemonRepository.getAll().forEach(function(pokemon) {
-  pokemonRepository.addListItem(pokemon);
+//Print all objects in pokemonList
+pokemonRepository.loadList().then(function() {
+  // Now the data is loaded!
+  pokemonRepository.getAll().forEach(function(pokemon){
+    pokemonRepository.addListItem(pokemon);
+  });
 });
