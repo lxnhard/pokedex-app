@@ -51,13 +51,13 @@ body {
   text-transform: capitalize;
   border: none;
   border: 1px solid rgba(0, 0, 0, 0.3);
-  background-color: #faf9f8;
+  background-color: #e3e9ef;
   color: #15151c;
   text-decoration: none;
   margin: 2px 0;
   padding: 0;
   width: 100%;
-  max-width: 768px;
+  max-width: 512px;
   height: 50px;
   line-height: 50px;
   transition: opacity 0.8s;
@@ -68,6 +68,89 @@ body {
   background-color: #7691b2;
   color: #faf9f8;
   opacity: 0.8;
+}
+
+/* Modal */
+
+#modal-container {
+  display: none;
+}
+
+#modal-container.is-visible {
+  /* CSS for modal container - add your own desired CSS styles here */
+  position: fixed;
+  padding: 20px;
+  box-sizing: border-box;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+
+  /* to show it above other content */
+  z-index: 999;
+
+  /* to allow scrolling if the screen is not high enough */
+  overflow: auto;
+
+  /* this is used to center the modal */
+  display: grid;
+  text-align: center;
+}
+
+.modal {
+  margin: auto;
+  display: inline-block;
+  box-sizing: border-box;
+  background: #fff;
+  padding: 15px;
+  width: 100%;
+  max-width: 468px;
+  text-align: left;
+  touch-action: 'none';
+}
+
+/* .modal-close {
+  float: right;
+  -webkit-appearance: none;
+  border: 0;
+  background: none;
+  color: #777;
+  text-decoration: underline;
+} */
+
+.modal-close {
+  float: right;
+  margin-top: -25px;
+  margin-right: -25px;
+  cursor: pointer;
+  color: #faf9f8;
+  border: 1px solid #faf9f8;
+  border-radius: 50%;
+  background: #7691b2;
+  font-size: 31px;
+  font-weight: bold;
+  display: inline-block;
+  line-height: 0px;
+  padding: 11px 3px;
+}
+
+.modal-close::before {
+  content: "×";
+}
+
+.modal h1 {
+  margin-top: 0;
+  text-transform: capitalize;
+}
+
+.modal p {
+  margin-bottom: 0;
+  text-transform: capitalize;
+}
+
+.pokemon-image {
+  float: right;
 }
 
 /* Pokeball Loader */
