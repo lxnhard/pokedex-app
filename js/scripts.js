@@ -142,6 +142,15 @@ function showModal(pokemon) {
 
   modalContainer.classList.add('is-visible');
 
+  //swipe function: event listeners + call function
+  modal.addEventListener('touchstart', e => {
+    touchstartX = e.changedTouches[0].screenX;
+  })
+  modal.addEventListener('touchend', e => {
+    touchendX = e.changedTouches[0].screenX;
+    swipe(pokemon);
+  })
+
 }
 
 function hideModal() {
@@ -162,6 +171,28 @@ modalContainer.addEventListener('click', (e) => {
     hideModal();
     }
   });
+
+
+//Swipe function;
+let touchstartX = 0;
+let touchendX = 0;
+
+function swipe(pokemon) {
+  //swipe left
+  if ((touchendX < (touchstartX-50)) && (pokemonList.indexOf(pokemon) < (pokemonList.length-1))) {
+    hideModal();
+    showDetails(pokemonList[pokemonList.indexOf(pokemon)+1]);
+    touchstartX = 0;
+    touchendX = 0;
+  }
+  //swipe right
+  if ((touchendX > (touchstartX+50)) && (pokemonList.indexOf(pokemon) > 0)) {
+    hideModal();
+    showDetails(pokemonList[pokemonList.indexOf(pokemon)-1]);
+    touchstartX = 0;
+    touchendX = 0;
+  }
+}
 
   //return public functions
   return {
