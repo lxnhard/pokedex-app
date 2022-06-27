@@ -49,11 +49,11 @@ body {
   font-weight: var(--semibold);
   font-family: inherit;
   text-transform: capitalize;
+  text-decoration: none;
+  color: #15151c;
   border: none;
   border: 1px solid rgba(0, 0, 0, 0.3);
   background-color: #e3e9ef;
-  color: #15151c;
-  text-decoration: none;
   margin: 2px 0;
   padding: 0;
   width: 100%;
@@ -64,10 +64,28 @@ body {
 }
 
 .pokemonButton:hover,
-.pokemonButton:focus {
+.pokemonButton:focus,
+.pokemonButton:active {
   background-color: #7691b2;
   color: #faf9f8;
   opacity: 0.8;
+  outline: 0;
+}
+
+/* Webkit / Chrome Specific CSS to remove tap
+highlight color */
+.pokemonButton {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Firefox Specific CSS to remove button
+differences and focus ring */
+.pokemonButton {
+  background-image: none;
+}
+
+.pokemonButton::-moz-focus-inner {
+  border: 0;
 }
 
 /* Modal */
