@@ -14,13 +14,29 @@ let pokemonRepository = (function() {
 
   //filter for Pokemon with specific name
   function findName(name) {
-    result = pokemonList.filter(pokemon => pokemon.name === name);
+    result = pokemonList.filter(pokemon => pokemon.name.startsWith(name));
     if (result.length > 0) {
       return result[0];
     } else {
-      console.log('The Pokémon you called is currently not available.');
+      $('#search-input').tooltip('show');
+      $(document).on("click",function() {
+          $('#search-input').tooltip('hide');
+      });
     }
   }
+
+  //Search function
+  $('#search-form').submit( e => {
+    e.preventDefault();
+    $('#search-input').tooltip('hide');
+    searchinput = $('#search-input').val().toLowerCase();
+    let result = findName(searchinput);
+    if (result) {
+      showDetails(result);
+      $('#detailsModal').modal('show');
+    }
+  })
+
 
   //add pokemon to html-list
   function addListItem(pokemon) {
