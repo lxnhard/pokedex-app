@@ -15,65 +15,36 @@ body {
   background-color: #faf9f8;
 }
 
-.header {
-  margin-bottom: 2px;
-}
-
-.headline {
-  background-color: #7691b2;
-  color: #faf9f8;
-  text-transform: uppercase;
-  text-align: center;
-  font-size: 32px;
-  width: 100%;
-  margin: 0;
-  padding: 0;
-  height: 50px;
-  line-height: 50px;
-}
-
-.pokemon-list-container {
-  text-align: center;
-  padding: 0 4px;
-}
-
-.pokemon-list {
+.list-group {
   list-style-type: none;
-  padding: 0;
-  margin: 0;
-  text-align: center;
+  display: inline-block;
+  width: 360px;
 }
 
 .pokemonButton {
   font-size: 20px;
-  font-weight: var(--semibold);
   font-family: inherit;
   text-transform: capitalize;
-  text-decoration: none;
-  color: #15151c;
-  border: none;
-  border: 1px solid rgba(0, 0, 0, 0.3);
   background-color: #e3e9ef;
-  margin: 2px 0;
-  padding: 0;
-  width: 100%;
-  max-width: 512px;
-  height: 50px;
-  line-height: 50px;
-  transition: opacity 0.8s;
+  margin: 4px 0;
 }
 
-.pokemonButton:hover,
-.pokemonButton:focus,
-.pokemonButton:active {
+.pokemonButton:focus {
   background-color: #7691b2;
   color: #faf9f8;
   opacity: 0.8;
   outline: 0;
 }
 
+.pokemonButton:active,
+.pokemonButton:hover {
+  background-color: #c8d3e0;
+  outline: 0;
+}
+
 /* Webkit / Chrome Specific CSS to remove tap
 highlight color */
+
 .pokemonButton {
   -webkit-tap-highlight-color: transparent;
 }
@@ -146,7 +117,7 @@ differences and focus ring */
   position: relative;
   overflow: hidden;
   border: 3px solid;
-  animation: frames 0.8s  linear 0s infinite;
+  animation: frames 0.8s linear 0s infinite;
 }
 
 .pokeball::after {
@@ -163,8 +134,8 @@ differences and focus ring */
   content: '';
   position: absolute;
   background-color: #fff;
-  width: 10px;
-  height: 10px;
+  width: 18px;
+  height: 18px;
   border: 4px solid;
   border-radius: 50%;
   bottom: 18px;

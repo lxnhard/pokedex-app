@@ -12,13 +12,29 @@
   <link rel="stylesheet" type="text/css" href="css/styles.css">
 </head>
 <body>
-  <header class="header">
-    <h1 class="headline">Pokedex</h1>
+  <header>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+      <a class="navbar-brand" href="index.html">
+        <img src="img/pokeball-icon.svg" width="50" height="50" class="d-inline-block align-top" alt="Pokeball Icon">
+        <span class="h1">Pokedex</span>
+      </a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSearch" aria-controls="navbarSearch" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarSearch">
+        <form class="form-inline ml-auto my-2 my-lg-0 justify-content-center" id="search-form">
+          <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search" id="search-input" data-placement="top" title="The Pokémon you called is currently not available.">
+          <button class="btn btn-primary my-2 my-sm-0 form-control" type="submit">Search</button>
+        </form>
+      </div>
+    </nav>
+
   </header>
   <main>
     <div class="pokemon-list-container">
-      <ul class="pokemon-list"></ul>
+      <ul class="pokemon-list list-group list-group-flush"></ul>
     </div>
+
     <!-- Modal -->
     <div class="modal fade" id="detailsModal" tabindex="-1" role="dialog" aria-labelledby="detailsModalLabel" aria-hidden="true">
       <div class="modal-dialog" role="document">
