@@ -153,3 +153,10 @@ differences and focus ring */
     transform: rotate(360deg);
   }
 }
+
+.back-to-top {
+  position: fixed;
+  bottom: 15px;
+  right: 15px;
+  display: none;
+}
