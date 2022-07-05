@@ -27,7 +27,10 @@ let pokemonRepository = (function() {
     let pokemonList = document.querySelector('.pokemon-list');
     let listItem = document.createElement('li');
     let button = document.createElement('button');
-    button.classList.add('pokemonButton');
+    button.setAttribute('type', 'button');
+    button.setAttribute('data-toggle', 'modal');
+    button.setAttribute('data-target', '#detailsModal');
+    button.classList.add('pokemonButton', 'list-group-item', 'list-group-item-action', 'w-100');
     button.innerText = pokemon.name;
     //append elements
     listItem.appendChild(button);
@@ -66,9 +69,12 @@ let pokemonRepository = (function() {
       return response.json();
     }).then(function (details) {
       // Now we add the details to the item
-      item.imageUrl = details.sprites.front_default;
+      item.imageUrlFront = details.sprites.front_default;
+      item.imageUrlBack = details.sprites.back_default;
       item.height = details.height;
+      item.weight = details.weight;
       item.types = details.types;
+      item.abilities = details.abilities;
       hideLoader();
     }).catch(function (e) {
       console.error(e);
@@ -96,102 +102,91 @@ function hideLoader() {
 
 
 // Modal
-let modalContainer = document.querySelector('#modal-container');
 
 function showModal(pokemon) {
-  modalContainer.innerHTML = '';
-  let modal = document.createElement('div');
-  modal.classList.add('modal');
-  modal.setAttribute("pointer-action", "none");
+  let modalBody = $(".modal-body");
+  let modalTitle = $(".modal-title");
+  let modalHeader = $(".modal-header");
 
-  let closeButtonElement = document.createElement('button');
-  closeButtonElement.classList.add('modal-close');
-  closeButtonElement.addEventListener('click', hideModal);
+  let modalImgFront = $("#modal-img-front");
+  let modalImgBack = $("#modal-img-back");
+
+  let modalHeight = $(".detail-height");
+  let modalWeight = $(".detail-weight");
+  let modalTypes = $(".detail-types");
+  let modalTypesHeadline = $(".detail-headline-types");
+  let modalAbilities = $(".detail-abilities");
+
+  modalTitle.empty();
+  modalHeight.empty();
+  modalWeight.empty();
+  modalTypes.empty();
+  modalTypesHeadline.empty();
+  modalAbilities.empty();
 
   //pokemon name as title
   let titleElement = document.createElement('h1');
   titleElement.innerText = pokemon.name;
+  titleElement.classList.add("capitalize");
 
-  //content element including...
-  let contentElement = document.createElement('p');
-  //..height
-  contentElement.innerHTML = "Height: "+pokemon.height+"<br>";
-  //..and types
+  //height element
+  let heightElement = document.createElement('span');
+  heightElement.innerHTML = pokemon.height+" m";
+  //weight element
+  let weightElement = document.createElement('span');
+  weightElement.innerHTML = pokemon.weight+" kg";
+
+  //types element
+  let typesElement = document.createElement('span');
+  let typesHeadline = document.createElement('span');
   let types = [];
   pokemon.types.forEach(function(typeObj){
     types.push(" "+typeObj.type.name);
   });
   //one or multiple types?
   if (types.length<2) {
-    contentElement.innerHTML += "Type:";
+    typesHeadline.innerHTML = "Type:";
   } else {
-    contentElement.innerHTML += "Types:";
+    typesHeadline.innerHTML = "Types:";
   }
-  contentElement.innerHTML += types.toString();
+  typesElement.innerHTML = types.toString();
+  typesElement.classList.add("capitalize");
 
-  //image of pokemon
-  let imageElement = document.createElement('img');
-  imageElement.classList.add('pokemon-image');
-  imageElement.src = pokemon.imageUrl;
-
-  modal.appendChild(closeButtonElement);
-  modal.appendChild(imageElement);
-  modal.appendChild(titleElement);
-  modal.appendChild(contentElement);
-  modalContainer.appendChild(modal);
-
-  modalContainer.classList.add('is-visible');
-
-  //swipe function: event listeners + call function
-  modal.addEventListener('touchstart', e => {
-    touchstartX = e.changedTouches[0].screenX;
-  })
-  modal.addEventListener('touchend', e => {
-    touchendX = e.changedTouches[0].screenX;
-    swipe(pokemon);
-  })
-
-}
-
-function hideModal() {
-  modalContainer.classList.remove('is-visible');
-}
-
-window.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape' && modalContainer.classList.contains('is-visible')) {
-    hideModal();
-  }
-});
-
-modalContainer.addEventListener('click', (e) => {
-  // Since this is also triggered when clicking INSIDE the modal
-  // We only want to close if the user clicks directly on the overlay
-  let target = e.target;
-  if (target === modalContainer) {
-    hideModal();
-    }
+  //abilities element
+  let abilitiesElement = document.createElement('span');
+  let abilities = [];
+  pokemon.abilities.forEach(function(abilitiesObj){
+    abilities.push(" "+abilitiesObj.ability.name);
   });
+  abilitiesElement.innerHTML = abilities.toString();
+  abilitiesElement.classList.add("capitalize");
 
+  modalTitle.append(titleElement);
+  modalHeight.append(heightElement);
+  modalWeight.append(weightElement);
+  modalTypes.append(typesElement);
+  modalTypesHeadline.append(typesHeadline);
+  modalAbilities.append(abilitiesElement);
+  // image of pokemon front
+  modalImgFront.attr("src", pokemon.imageUrlFront);
+  // image of pokemon back
+  modalImgBack.attr("src", pokemon.imageUrlBack);
 
-//Swipe function;
-let touchstartX = 0;
-let touchendX = 0;
-
-function swipe(pokemon) {
-  //swipe left
-  if ((touchendX < (touchstartX-50)) && (pokemonList.indexOf(pokemon) < (pokemonList.length-1))) {
-    hideModal();
-    showDetails(pokemonList[pokemonList.indexOf(pokemon)+1]);
-    touchstartX = 0;
-    touchendX = 0;
-  }
-  //swipe right
-  if ((touchendX > (touchstartX+50)) && (pokemonList.indexOf(pokemon) > 0)) {
-    hideModal();
-    showDetails(pokemonList[pokemonList.indexOf(pokemon)-1]);
-    touchstartX = 0;
-    touchendX = 0;
-  }
+  //Button Next
+  buttonNext = $('#button-next');
+  buttonNext.off().on('click', e => {
+      if (pokemonList.indexOf(pokemon) < (pokemonList.length-1)) {
+        showDetails(pokemonList[pokemonList.indexOf(pokemon)+1]);
+        return;
+      }
+  })
+  //Button Previous
+  buttonPrev = $('#button-prev');
+  buttonPrev.off().on('click', e => {
+      if (pokemonList.indexOf(pokemon) > 0) {
+        showDetails(pokemonList[pokemonList.indexOf(pokemon)-1]);
+      }
+  })
 }
 
   //return public functions
