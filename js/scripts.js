@@ -4,8 +4,9 @@ let pokemonRepository = (function() {
 
   //retrieve all Pokemon
   function getAll() {
-    return pokemonList;
+    return pokemonList.slice(-150);
   }
+
 
   //add new Pokemon
   function add(item) {
@@ -60,6 +61,9 @@ let pokemonRepository = (function() {
   //fetch list data from api
   function loadList() {
     showLoader();
+    let offset = Math.floor(pokemonList.length/150)*150;
+    apiUrl = 'https://pokeapi.co/api/v2/pokemon/?offset='+offset+'&limit=150';
+    console.log(apiUrl);
     return fetch(apiUrl).then(function (response) {
       return response.json();
     }).then(function (json) {
@@ -76,6 +80,20 @@ let pokemonRepository = (function() {
       hideLoader();
     })
   }
+
+
+  // load next 150 pokemon at end of page//
+  $(window).scroll(function() {
+     if($(window).scrollTop() + $(window).height() == $(document).height()) {
+       pokemonRepository.loadList().then(function() {
+         // Now the data is loaded!
+         pokemonRepository.getAll().forEach(function(pokemon){
+           pokemonRepository.addListItem(pokemon);
+         });
+       });
+     }
+  });
+
 
   //fetch detail data from api
   function loadDetails(item) {
@@ -184,9 +202,9 @@ function showModal(pokemon) {
   modalTypesHeadline.append(typesHeadline);
   modalAbilities.append(abilitiesElement);
   // image of pokemon front
-  modalImgFront.attr("src", pokemon.imageUrlFront);
+  pokemon.imageUrlFront ? modalImgFront.attr("src", pokemon.imageUrlFront) : modalImgFront.attr("src", "img/fallback.svg");
   // image of pokemon back
-  modalImgBack.attr("src", pokemon.imageUrlBack);
+  pokemon.imageUrlBack ? modalImgBack.attr("src", pokemon.imageUrlBack) : modalImgBack.attr("src", "img/fallback.svg");;
 
   //Button Next
   buttonNext = $('#button-next');
