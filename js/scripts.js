@@ -157,6 +157,8 @@ function showModal(pokemon) {
   modalTypes.empty();
   modalTypesHeadline.empty();
   modalAbilities.empty();
+  modalImgFront.attr("src", "img/fallback.svg");
+  modalImgBack.attr("src", "img/fallback.svg");
 
   //pokemon name as title
   let titleElement = document.createElement('h1');
