@@ -2,11 +2,10 @@ let pokemonRepository = (function() {
   let pokemonList = [];
   let apiUrl = 'https://pokeapi.co/api/v2/pokemon/?limit=150';
 
-  //retrieve all Pokemon
+  //retrieve most recently loaded 150 pokemon
   function getAll() {
     return pokemonList.slice(-150);
   }
-
 
   //add new Pokemon
   function add(item) {
@@ -21,7 +20,7 @@ let pokemonRepository = (function() {
     } else {
       $('#search-input').tooltip('show');
       $(document).on("click",function() {
-          $('#search-input').tooltip('hide');
+        $('#search-input').tooltip('hide');
       });
     }
   }
@@ -37,7 +36,6 @@ let pokemonRepository = (function() {
       $('#detailsModal').modal('show');
     }
   })
-
 
   //add pokemon to html-list
   function addListItem(pokemon) {
@@ -63,7 +61,6 @@ let pokemonRepository = (function() {
     showLoader();
     let offset = Math.floor(pokemonList.length/150)*150;
     apiUrl = 'https://pokeapi.co/api/v2/pokemon/?offset='+offset+'&limit=150';
-    console.log(apiUrl);
     return fetch(apiUrl).then(function (response) {
       return response.json();
     }).then(function (json) {
@@ -80,21 +77,6 @@ let pokemonRepository = (function() {
       hideLoader();
     })
   }
-
-
-  // load next 150 pokemon at end of page//
-  $(window).scroll(function() {
-     if($(window).scrollTop() + $(window).height() == $(document).height()) {
-       pokemonRepository.loadList().then(function() {
-         // Now the data is loaded!
-         pokemonRepository.getAll().forEach(function(pokemon){
-           pokemonRepository.addListItem(pokemon);
-         });
-       });
-     }
-  });
-
-
   //fetch detail data from api
   function loadDetails(item) {
     showLoader();
@@ -119,144 +101,178 @@ let pokemonRepository = (function() {
   //show details for pokemon
   function showDetails(pokemon) {
     loadDetails(pokemon).then(function () {
-      //show Modal
       showModal(pokemon);
     });
   }
 
-//show/hide pokeball loader
-function showLoader() {
-  let loader = document.querySelector('.pokeball');
-  loader.classList.remove('hidden');
-}
-function hideLoader() {
-  let loader = document.querySelector('.pokeball');
-  loader.classList.add('hidden');
-}
-
-
-// Modal
-
-function showModal(pokemon) {
-  let modalBody = $(".modal-body");
-  let modalTitle = $(".modal-title");
-  let modalHeader = $(".modal-header");
-
-  let modalImgFront = $("#modal-img-front");
-  let modalImgBack = $("#modal-img-back");
-
-  let modalHeight = $(".detail-height");
-  let modalWeight = $(".detail-weight");
-  let modalTypes = $(".detail-types");
-  let modalTypesHeadline = $(".detail-headline-types");
-  let modalAbilities = $(".detail-abilities");
-
-  modalTitle.empty();
-  modalHeight.empty();
-  modalWeight.empty();
-  modalTypes.empty();
-  modalTypesHeadline.empty();
-  modalAbilities.empty();
-  modalImgFront.attr("src", "img/fallback.svg");
-  modalImgBack.attr("src", "img/fallback.svg");
-
-  //pokemon name as title
-  let titleElement = document.createElement('h1');
-  titleElement.innerText = pokemon.name;
-  titleElement.classList.add("capitalize");
-
-  //height element
-  let heightElement = document.createElement('span');
-  heightElement.innerHTML = pokemon.height+" m";
-  //weight element
-  let weightElement = document.createElement('span');
-  weightElement.innerHTML = pokemon.weight+" kg";
-
-  //types element
-  let typesElement = document.createElement('span');
-  let typesHeadline = document.createElement('span');
-  let types = [];
-  pokemon.types.forEach(function(typeObj){
-    types.push(" "+typeObj.type.name);
-  });
-  //one or multiple types?
-  if (types.length<2) {
-    typesHeadline.innerHTML = "Type:";
-  } else {
-    typesHeadline.innerHTML = "Types:";
+  // load new Pokemon in list and display
+  // promise gets rejected if now further pokemon available in API
+  function loadDisplay() {
+    let promise = new Promise(function (resolve, reject) {
+      if (Math.floor(pokemonList.length/150)*150 < 1154) {
+        loadList().then(function() {
+          getAll().forEach(function(pokemon){
+            addListItem(pokemon);
+          });
+        });
+        resolve();
+      } else {
+        reject();
+      }
+    });
+    return promise;
   }
-  typesElement.innerHTML = types.toString();
-  typesElement.classList.add("capitalize");
 
-  //abilities element
-  let abilitiesElement = document.createElement('span');
-  let abilities = [];
-  pokemon.abilities.forEach(function(abilitiesObj){
-    abilities.push(" "+abilitiesObj.ability.name);
+  // load next 150 pokemon at end of page//
+  $(window).scroll(function() {
+    if ($(window).scrollTop() + $(window).height() == $(document).height()) {
+      loadDisplay().catch(e => {});
+    }
   });
-  abilitiesElement.innerHTML = abilities.toString();
-  abilitiesElement.classList.add("capitalize");
 
-  modalTitle.append(titleElement);
-  modalHeight.append(heightElement);
-  modalWeight.append(weightElement);
-  modalTypes.append(typesElement);
-  modalTypesHeadline.append(typesHeadline);
-  modalAbilities.append(abilitiesElement);
+  //show/hide pokeball loader
+  function showLoader() {
+    let loader = document.querySelector('.pokeball');
+    loader.classList.remove('hidden');
+  }
+  function hideLoader() {
+    let loader = document.querySelector('.pokeball');
+    loader.classList.add('hidden');
+  }
+
+
+  // Modal
+  function showModal(pokemon) {
+    let modalBody = $(".modal-body");
+    let modalTitle = $(".modal-title");
+    let modalHeader = $(".modal-header");
+
+    let modalImgFront = $("#modal-img-front");
+    let modalImgBack = $("#modal-img-back");
+
+    let modalHeight = $(".detail-height");
+    let modalWeight = $(".detail-weight");
+    let modalTypes = $(".detail-types");
+    let modalTypesHeadline = $(".detail-headline-types");
+    let modalAbilities = $(".detail-abilities");
+
+    modalTitle.empty();
+    modalHeight.empty();
+    modalWeight.empty();
+    modalTypes.empty();
+    modalTypesHeadline.empty();
+    modalAbilities.empty();
+
+    //pokemon name as title
+    let titleElement = document.createElement('h1');
+    titleElement.innerText = pokemon.name;
+    titleElement.classList.add("capitalize");
+
+    //height element
+    let heightElement = document.createElement('span');
+    heightElement.innerHTML = pokemon.height+" m";
+    //weight element
+    let weightElement = document.createElement('span');
+    weightElement.innerHTML = pokemon.weight+" kg";
+
+    //types element
+    let typesElement = document.createElement('span');
+    let typesHeadline = document.createElement('span');
+    let types = [];
+    pokemon.types.forEach(function(typeObj){
+      types.push(" "+typeObj.type.name);
+    });
+    //one or multiple types?
+    if (types.length<2) {
+      typesHeadline.innerHTML = "Type:";
+    } else {
+      typesHeadline.innerHTML = "Types:";
+    }
+    typesElement.innerHTML = types.toString();
+    typesElement.classList.add("capitalize");
+
+    //abilities element
+    let abilitiesElement = document.createElement('span');
+    let abilities = [];
+    pokemon.abilities.forEach(function(abilitiesObj){
+      abilities.push(" "+abilitiesObj.ability.name);
+    });
+    abilitiesElement.innerHTML = abilities.toString();
+    abilitiesElement.classList.add("capitalize");
+
   // image of pokemon front
   pokemon.imageUrlFront ? modalImgFront.attr("src", pokemon.imageUrlFront) : modalImgFront.attr("src", "img/fallback.svg");
   // image of pokemon back
   pokemon.imageUrlBack ? modalImgBack.attr("src", pokemon.imageUrlBack) : modalImgBack.attr("src", "img/fallback.svg");;
+    modalTitle.append(titleElement);
+    modalHeight.append(heightElement);
+    modalWeight.append(weightElement);
+    modalTypes.append(typesElement);
+    modalTypesHeadline.append(typesHeadline);
+    modalAbilities.append(abilitiesElement);
+    // image of pokemon front
+    pokemon.imageUrlFront ? modalImgFront.attr("src", pokemon.imageUrlFront) : modalImgFront.attr("src", "img/fallback.svg");
+    // image of pokemon back
+    pokemon.imageUrlBack ? modalImgBack.attr("src", pokemon.imageUrlBack) : modalImgBack.attr("src", "img/fallback.svg");;
 
-  //Button Next
-  buttonNext = $('#button-next');
-  buttonNext.off().on('click', e => {
+    //Button Next
+    buttonNext = $('#button-next');
+    buttonNext.off().on('click', e => {
+      //if next pokemon is within loaded list, show its modal
       if (pokemonList.indexOf(pokemon) < (pokemonList.length-1)) {
         showDetails(pokemonList[pokemonList.indexOf(pokemon)+1]);
-        return;
       }
+      else {
+        //if next pokemon is not within loaded list, load next 150 and show its modal
+        loadDisplay()
+        .then(function() {
+          showDetails(pokemonList[pokemonList.indexOf(pokemon)+1]);
+          hideLoader();
+        })
+        .catch(function() {
+          hideLoader();
+        })
+    }
   })
   //Button Previous
   buttonPrev = $('#button-prev');
   buttonPrev.off().on('click', e => {
-      if (pokemonList.indexOf(pokemon) > 0) {
-        showDetails(pokemonList[pokemonList.indexOf(pokemon)-1]);
-      }
+    if (pokemonList.indexOf(pokemon) > 0) {
+      showDetails(pokemonList[pokemonList.indexOf(pokemon)-1]);
+    }
   })
 }
 
-  //return public functions
-  return {
-    getAll,
-    add,
-    findName,
-    addListItem,
-    loadList,
-    loadDetails
-  }
+//return public functions
+return {
+  getAll,
+  add,
+  findName,
+  addListItem,
+  loadList,
+  loadDetails,
+  loadDisplay
+}
 })();
 
-//Print all objects in pokemonList
-pokemonRepository.loadList().then(function() {
-  // Now the data is loaded!
-  pokemonRepository.getAll().forEach(function(pokemon){
-    pokemonRepository.addListItem(pokemon);
-  });
-});
+//load and display first 150 Pokemon
+pokemonRepository.loadDisplay();
 
+
+//back to top
 $(document).ready(function () {
-	$(window).scroll(function () {
-			if ($(this).scrollTop() > 50) {
-				$("#back-to-top").fadeIn();
-			} else {
-				$("#back-to-top").fadeOut();
-			}
-		});
-		// scroll body to 0px on click
-		$("#back-to-top").click(function () {
-			$("body,html").animate({
-				scrollTop: 0
-			}, 400);
-			return false;
-		});
+  $(window).scroll(function () {
+    if ($(this).scrollTop() > 50) {
+      $("#back-to-top").fadeIn();
+    } else {
+      $("#back-to-top").fadeOut();
+    }
+  });
+  // scroll body to 0px on click
+  $("#back-to-top").click(function () {
+    $("body,html").animate({
+      scrollTop: 0
+    }, 400);
+    return false;
+  });
 });
