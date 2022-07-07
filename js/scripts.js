@@ -200,10 +200,6 @@ let pokemonRepository = (function() {
     abilitiesElement.innerHTML = abilities.toString();
     abilitiesElement.classList.add("capitalize");
 
-  // image of pokemon front
-  pokemon.imageUrlFront ? modalImgFront.attr("src", pokemon.imageUrlFront) : modalImgFront.attr("src", "img/fallback.svg");
-  // image of pokemon back
-  pokemon.imageUrlBack ? modalImgBack.attr("src", pokemon.imageUrlBack) : modalImgBack.attr("src", "img/fallback.svg");;
     modalTitle.append(titleElement);
     modalHeight.append(heightElement);
     modalWeight.append(weightElement);
@@ -241,6 +237,13 @@ let pokemonRepository = (function() {
       showDetails(pokemonList[pokemonList.indexOf(pokemon)-1]);
     }
   })
+
+  // empty image on modal close
+  $("#detailsModal").on("hidden.bs.modal", function () {
+    modalImgFront.attr("src", "");
+    modalImgBack.attr("src", "");
+  });
+
 }
 
 //return public functions
