@@ -70,8 +70,8 @@ let pokemonRepository = (function() {
           detailsUrl: item.url
         };
         add(pokemon);
-        hideLoader();
       });
+      hideLoader();
     }).catch(function (e) {
       console.error(e);
       hideLoader();
@@ -111,11 +111,12 @@ let pokemonRepository = (function() {
     let promise = new Promise(function (resolve, reject) {
       if (Math.floor(pokemonList.length/150)*150 < 1154) {
         loadList().then(function() {
-          getAll().forEach(function(pokemon){
+          getAll().forEach(function(pokemon) {
             addListItem(pokemon);
           });
+        }).then(function() {
+          resolve();
         });
-        resolve();
       } else {
         reject();
       }
@@ -216,12 +217,19 @@ let pokemonRepository = (function() {
     buttonNext.off().on('click', e => {
       //if next pokemon is within loaded list, show its modal
       if (pokemonList.indexOf(pokemon) < (pokemonList.length-1)) {
+        // empty image
+        modalImgFront.attr("src", "");
+        modalImgBack.attr("src", "");
+        //load new details
         showDetails(pokemonList[pokemonList.indexOf(pokemon)+1]);
       }
       else {
         //if next pokemon is not within loaded list, load next 150 and show its modal
-        loadDisplay()
-        .then(function() {
+        //load new list
+        loadDisplay().then(function() {
+          // empty image
+          modalImgFront.attr("src", "");
+          modalImgBack.attr("src", "");
           showDetails(pokemonList[pokemonList.indexOf(pokemon)+1]);
           hideLoader();
         })
@@ -234,6 +242,8 @@ let pokemonRepository = (function() {
   buttonPrev = $('#button-prev');
   buttonPrev.off().on('click', e => {
     if (pokemonList.indexOf(pokemon) > 0) {
+      modalImgFront.attr("src", "");
+      modalImgBack.attr("src", "");
       showDetails(pokemonList[pokemonList.indexOf(pokemon)-1]);
     }
   })
